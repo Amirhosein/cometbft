@@ -23,6 +23,13 @@
   instead of silently dropping the condition and widening the results to
   rows the query explicitly excludes
   ([\#PENDING](https://github.com/cometbft/cometbft/pull/PENDING))
+- `[types]` reject `Block.MaxBytes` values that cannot fit a block header and a
+  one-validator commit, so genesis files and consensus-parameter updates fail
+  before that value is committed. `TxPreCheck` returns an error instead of
+  panicking when an already committed value is still too small for the current
+  validator set, so node startup and the post-commit mempool refresh no longer
+  crash
+  ([\#6100](https://github.com/cometbft/cometbft/pull/6100))
 
 ### IMPROVEMENTS
 

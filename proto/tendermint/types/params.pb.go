@@ -116,7 +116,8 @@ func (m *ConsensusParams) GetAuthority() *AuthorityParams {
 // BlockParams contains limits on the block size.
 type BlockParams struct {
 	// Max block size, in bytes.
-	// Note: must be greater than 0
+	// Note: must be -1 (hard maximum) or at least large enough for the block
+	// overhead, a maximum header, and a one-validator commit.
 	MaxBytes int64 `protobuf:"varint,1,opt,name=max_bytes,json=maxBytes,proto3" json:"max_bytes,omitempty"`
 	// Max gas per block.
 	// Note: must be greater or equal to -1

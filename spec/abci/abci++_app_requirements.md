@@ -625,7 +625,9 @@ If the Application sets value -1, consensus will:
 - consider that the actual value to enforce is 100 MB
 - will provide *all* transactions in the mempool in calls to `PrepareProposal`
 
-Must have `MaxBytes == -1` OR `0 < MaxBytes <= 100 MB`.
+Must have `MaxBytes == -1` OR `MinBlockSizeBytes <= MaxBytes <= 100 MB`,
+where `MinBlockSizeBytes` is the space required for block overhead, a maximum
+header, and a one-validator commit. Smaller positive values are rejected.
 
 > Bear in mind that the default value for the `BlockParams.MaxBytes` consensus
 > parameter accepts as valid blocks with size up to 21 MB.

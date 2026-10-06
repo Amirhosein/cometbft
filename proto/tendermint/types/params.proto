@@ -21,7 +21,8 @@ message ConsensusParams {
 // BlockParams contains limits on the block size.
 message BlockParams {
   // Max block size, in bytes.
-  // Note: must be greater than 0
+  // Note: must be -1 (hard maximum) or at least large enough for the block
+  // overhead, a maximum header, and a one-validator commit.
   int64 max_bytes = 1;
   // Max gas per block.
   // Note: must be greater or equal to -1

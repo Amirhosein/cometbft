@@ -201,6 +201,12 @@ func (params ConsensusParams) ValidateBasic() error {
 		return fmt.Errorf("block.MaxBytes is too big. %d > %d",
 			params.Block.MaxBytes, MaxBlockSizeBytes)
 	}
+	// Below this floor MaxDataBytesNoEvidence panics even for one validator.
+	// Validator-set-specific room is not known here; see MinBlockSizeBytes.
+	if params.Block.MaxBytes != -1 && params.Block.MaxBytes < MinBlockSizeBytes {
+		return fmt.Errorf("block.MaxBytes is too small to accommodate minimum header and commit overhead. %d < %d",
+			params.Block.MaxBytes, MinBlockSizeBytes)
+	}
 
 	if params.Block.MaxGas < -1 {
 		return fmt.Errorf("block.MaxGas must be greater or equal to -1. Got %d",

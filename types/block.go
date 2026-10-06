@@ -39,6 +39,22 @@ const (
 	MaxOverheadForBlock int64 = 11
 )
 
+// MinBlockBytes is the smallest Block.MaxBytes for which
+// MaxDataBytesNoEvidence(maxBytes, valsCount) does not panic. It reserves the
+// block encoding overhead, a maximum-sized header, and a worst-case commit for
+// valsCount validators, and leaves no room for transactions or evidence.
+func MinBlockBytes(valsCount int) int64 {
+	return MaxOverheadForBlock + MaxHeaderBytes + MaxCommitBytes(valsCount)
+}
+
+// MinBlockSizeBytes is the Block.MaxBytes floor enforced by
+// ConsensusParams.ValidateBasic (aside from -1, which means the hard maximum).
+// It is MinBlockBytes for a single validator: any smaller value cannot form a
+// block. A larger validator set needs MinBlockBytes(valsCount). A value in
+// between is still a misconfiguration and still halts proposal creation; see
+// MaxDataBytes.
+var MinBlockSizeBytes = MinBlockBytes(1)
+
 // Block defines the atomic unit of a CometBFT blockchain.
 type Block struct {
 	mtx cmtsync.Mutex

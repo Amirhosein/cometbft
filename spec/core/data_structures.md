@@ -505,9 +505,14 @@ func SumTruncated(bz []byte) []byte {
 | max_bytes | int64 | Maximum size of a block, in bytes.                      | 1            |
 | max_gas   | int64 | Maximum gas wanted by transactions included in a block. | 2            |
 
-The `max_bytes` parameter must be greater or equal to -1, and cannot be greater
-than the hard-coded maximum block size, which is 100MB.
+The `max_bytes` parameter must be -1, or at least large enough to fit the block
+encoding overhead, a maximum-sized header, and a commit for one validator at
+the maximum signature size. It cannot be greater than the hard-coded maximum
+block size, which is 100MB.
 If set to -1, the limit is the hard-coded maximum block size.
+Smaller positive values are rejected by consensus-parameter validation: they
+cannot form a block, and constructing one would panic. A validator set larger
+than one may require a higher limit.
 
 The `max_gas` parameter must be greater or equal to -1.
 If set to -1, no limit is enforced.

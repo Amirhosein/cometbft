@@ -483,6 +483,8 @@ func TestBlockMaxDataBytes(t *testing.T) {
 }
 
 func TestBlockMaxDataBytesNoEvidence(t *testing.T) {
+	assert.Equal(t, int64(4089), MinBlockBytes(1))
+
 	testCases := []struct {
 		maxBytes  int64
 		valsCount int

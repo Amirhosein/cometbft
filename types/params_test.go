@@ -23,29 +23,32 @@ func TestConsensusParamsValidation(t *testing.T) {
 		valid  bool
 	}{
 		// test block params
-		0: {makeParams(1, 0, 2, 0, valEd25519, 0, ""), true},
+		0: {makeParams(MinBlockSizeBytes, 0, 2, 0, valEd25519, 0, ""), true},
 		1: {makeParams(0, 0, 2, 0, valEd25519, 0, ""), false},
 		2: {makeParams(47*1024*1024, 0, 2, 0, valEd25519, 0, ""), true},
-		3: {makeParams(10, 0, 2, 0, valEd25519, 0, ""), true},
-		4: {makeParams(100*1024*1024, 0, 2, 0, valEd25519, 0, ""), true},
-		5: {makeParams(101*1024*1024, 0, 2, 0, valEd25519, 0, ""), false},
-		6: {makeParams(1024*1024*1024, 0, 2, 0, valEd25519, 0, ""), false},
+		// Below the header+commit floor. 1 is the #6098 repro; 10 used to pass.
+		3: {makeParams(MinBlockSizeBytes-1, 0, 2, 0, valEd25519, 0, ""), false},
+		4: {makeParams(1, 0, 2, 0, valEd25519, 0, ""), false},
+		5: {makeParams(10, 0, 2, 0, valEd25519, 0, ""), false},
+		6: {makeParams(100*1024*1024, 0, 2, 0, valEd25519, 0, ""), true},
+		7: {makeParams(101*1024*1024, 0, 2, 0, valEd25519, 0, ""), false},
+		8: {makeParams(1024*1024*1024, 0, 2, 0, valEd25519, 0, ""), false},
 		// test evidence params
-		7:  {makeParams(1, 0, 0, 0, valEd25519, 0, ""), false},
-		8:  {makeParams(1, 0, 2, 2, valEd25519, 0, ""), false},
-		9:  {makeParams(1000, 0, 2, 1, valEd25519, 0, ""), true},
-		10: {makeParams(1, 0, -1, 0, valEd25519, 0, ""), false},
+		9:  {makeParams(MinBlockSizeBytes, 0, 0, 0, valEd25519, 0, ""), false},
+		10: {makeParams(MinBlockSizeBytes, 0, 2, MinBlockSizeBytes+1, valEd25519, 0, ""), false},
+		11: {makeParams(MinBlockSizeBytes+1000, 0, 2, 1, valEd25519, 0, ""), true},
+		12: {makeParams(MinBlockSizeBytes, 0, -1, 0, valEd25519, 0, ""), false},
 		// test no pubkey type provided
-		11: {makeParams(1, 0, 2, 0, []string{}, 0, ""), false},
+		13: {makeParams(MinBlockSizeBytes, 0, 2, 0, []string{}, 0, ""), false},
 		// test invalid pubkey type provided
-		12: {makeParams(1, 0, 2, 0, []string{"potatoes make good pubkeys"}, 0, ""), false},
-		13: {makeParams(-1, 0, 2, 0, valEd25519, 0, ""), true},
-		14: {makeParams(-2, 0, 2, 0, valEd25519, 0, ""), false},
+		14: {makeParams(MinBlockSizeBytes, 0, 2, 0, []string{"potatoes make good pubkeys"}, 0, ""), false},
+		15: {makeParams(-1, 0, 2, 0, valEd25519, 0, ""), true},
+		16: {makeParams(-2, 0, 2, 0, valEd25519, 0, ""), false},
 		// test authority params
-		15: {makeParams(1, 0, 2, 0, valEd25519, 0, ""), true},
-		16: {makeParams(1, 0, 2, 0, valEd25519, 0, string(make([]byte, 257))), false},
-		17: {makeParams(1, 0, 2, 0, valEd25519, 0, "governance-module"), true},
-		18: {makeParams(1, 0, 2, 0, valEd25519, 0, "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"), true},
+		17: {makeParams(MinBlockSizeBytes, 0, 2, 0, valEd25519, 0, ""), true},
+		18: {makeParams(MinBlockSizeBytes, 0, 2, 0, valEd25519, 0, string(make([]byte, 257))), false},
+		19: {makeParams(MinBlockSizeBytes, 0, 2, 0, valEd25519, 0, "governance-module"), true},
+		20: {makeParams(MinBlockSizeBytes, 0, 2, 0, valEd25519, 0, "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn"), true},
 	}
 	for i, tc := range testCases {
 		if tc.valid {
